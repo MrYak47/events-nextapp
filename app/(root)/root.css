@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@layer base {
+
+
+
+   body {
+      .rays {
+         @apply absolute -z-1 min-h-screen inset-0 ;
+      }
+   }
+}
+
+
+
+
+
+
+@layer components {
+
+   main {
+      
+      h1 {
+         @apply text-center font-bold text-4xl max-sm:text-2xl;
+      }
+
+      .subhead {
+         @apply text-center mt-5;
+      }
+
+      .explorebtn {
+         @apply mt-7 mx-auto;
+      }
+      
+      img {
+         @apply w-5 h-5;
+      }
+
+
+      .ft-events {
+         @apply mt-20 space-y-7;
+      }
+
+      .events {
+         @apply grid md:grid-cols-3 gap-10 sm:grid-cols-2 grid-cols-1;
+         color: none;
+      }
+      
+      .about {
+         @apply text-center font-bold;
+      }
+      #event-card {
+         @apply flex flex-col gap-3;
+   
+         .poster {
+            @apply  h-50 z-2 w-max rounded-lg object-cover;
+         }
+   
+         .c_title {
+            @apply text-[20px] font-semibold line-clamp-1;
+         }
+   
+         p {
+            @apply text-sm ;
+         }
+   
+         .datetime {
+            @apply flex flex-row flex-wrap items-center gap-4;
+   
+            div {
+            @apply flex flex-row gap-2;
+            }
+         }
+      }
+   }
+}
+
