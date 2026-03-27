@@ -1,11 +1,7 @@
 import React from 'react'
 import ExploreBtn from '@/components/ExploreBtn'
 import EventCard from '@/components/EventCard'
-
-const events = [
-   {image: '/images/event1.png', title: 'Event 1'},
-   {image: '/images/event2.png', title: 'Event 2'}
-]
+import { events } from '@/lib/constants';
 
 
 const Home = () => {
@@ -23,7 +19,7 @@ const Home = () => {
 
             <ul className='events'>
                {events.map((event) => (
-                  <li key={event.title}>
+                  <li key={event.id}>
                   <EventCard {...event} />
                   </li>
                ))}
@@ -36,5 +32,6 @@ const Home = () => {
       </section>
    )
 }
+
 
 export default Home
