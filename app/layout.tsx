@@ -5,6 +5,9 @@ import "./(root)/root.css"
 import { cn } from "@/lib/utils";
 import LightRays from '../components/LightRays'
 import Navbar from '../components/Navbar'
+import { PostHogProvider } from '../components/PostHogProvider'
+import { PostHogPageView } from '../components/PostHogPageView'
+import { Suspense } from 'react'
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -34,6 +37,8 @@ export default function RootLayout({children,}:
    return (
       <html lang="en" >
          <body className={`${schibstedG.variable} ${matianM.variable} min-h-screen antialiased`}>
+         <PostHogProvider>
+         <Suspense fallback={null}><PostHogPageView /></Suspense>
 
             <Navbar />
             
@@ -59,9 +64,10 @@ export default function RootLayout({children,}:
             </main>
          
          
+         </PostHogProvider>
          </body>
 
-      
+
       </html>
    );
 }
