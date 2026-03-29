@@ -59,7 +59,8 @@ const normalizeTime = (time: string): string => {
    if (!timeRegex.test(time)) {
       throw new Error('Invalid time format. Please use HH:mm format (e.g., 09:00).');
    }
-   return time;
+   const [hours, minutes] = time.split(':');
+   return `${hours.padStart(2, '0')}:${minutes}`;
 };
 
 const eventSchema = new Schema<EventDocument>(
