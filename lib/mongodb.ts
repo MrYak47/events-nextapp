@@ -4,7 +4,7 @@ import mongoose, { Connection } from 'mongoose';
 interface MongooseCache {
    conn: Connection | null;
    promise: Promise<Connection> | null;
-}0
+}
 
 // Declare global type for Node.js to store cached connection
 declare global {
