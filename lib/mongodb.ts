@@ -27,8 +27,11 @@ if (!global.mongooseCache) {
  */
 export async function connectDB(): Promise<Connection> {
   // Return cached connection if already connected
-   if (cached.conn) {
+   if (cached.conn && cached.conn.readyState === 1) {
       return cached.conn;
+   }
+   if (cached.conn && cached.conn.readyState !== 1) {
+      cached.conn = null;
    }
 
   // If connection promise is pending, wait for it to resolve
@@ -73,11 +76,18 @@ export async function connectDB(): Promise<Connection> {
  * @returns Promise<void>
  */
 export async function disconnectDB(): Promise<void> {
-   if (cached.conn) {
-      await mongoose.disconnect();
-      cached.conn = null;
-      cached.promise = null;
-   }
+         try {
+            await cached.promise;
+         } catch {
+            // ignore: connection attempt already failed
+         }
+      
+         if (mongoose.connection.readyState !== 0) {
+            await mongoose.disconnect();
+         }
+      
+         cached.conn = null;
+         cached.promise = null;
 }
 
 /**

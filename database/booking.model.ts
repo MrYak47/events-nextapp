@@ -43,21 +43,18 @@ const bookingSchema = new Schema<BookingDocument>(
    }
 );
 
-// Pre-save hook to verify that the referenced event exists
 bookingSchema.pre('save', async function (next) {
    try {
-      // Validate email format
-      if (!isValidEmail(this.email)) {
-         return next(new Error('Invalid email format'));
-      }
-
       // Verify that the referenced event exists
-      const eventExists = await Event.findById(this.eventId);
-      if (!eventExists) {
-         return next(new Error(`Event with ID ${this.eventId} does not exist`));
-      }
+         if (this.isNew || this.isModified('eventId')) {
+            const eventExists = await Event.findById(this.eventId);
+            if (!eventExists) {
+               return next(new Error(`Event with ID ${this.eventId} does not exist`));
+            }
+         }
 
-      next();
+         next();
+
    } catch (error) {
       next(error as Error);
    }

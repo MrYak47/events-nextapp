@@ -1,4 +1,12 @@
-import { Schema, model, Document, Model } from 'mongoose';
+import { Schema, model, Document, Model, models } from 'mongoose';
+
+/**
+ * MongooseUpdatePayload represents the structure of MongoDB update operations
+ */
+interface MongooseUpdatePayload {
+   $set?: Record<string, unknown>;
+   [key: string]: unknown;
+}
 
 /**
  * EventDocument represents a MongoDB document for an Event
@@ -31,19 +39,34 @@ const generateSlug = (title: string): string => {
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+      .replace(/\s/g, '-') // Replace spaces with hyphens
+      .replace(/-/g, '-'); // Replace multiple hyphens with single hyphen
 };
 
 /**
  * Validate and normalize date to ISO format (YYYY-MM-DD)
  */
 const normalizeDate = (date: string): string => {
-   const dateObj = new Date(date);
-   if (isNaN(dateObj.getTime())) {
-      throw new Error('Invalid date format. Please provide a valid date.');
+   
+   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
+   if (!match) {
+      throw new Error('Invalid date format. Please use YYYY-MM-DD.');
    }
-   return dateObj.toISOString().split('T')[0];
+
+   const year = Number(match[1]);
+   const month = Number(match[2]);
+   const day = Number(match[3]);
+   const utc = new Date(Date.UTC(year, month - 1, day));
+
+   if ( utc.getUTCFullYear() !== year ||
+         utc.getUTCMonth() !== month - 1 ||
+         utc.getUTCDate() !== day
+   ) {
+         throw new Error('Invalid calendar date.');
+      }
+
+      return `${match[1]}-${match[2]}-${match[3]}`;
+   
 };
 
 /**
@@ -54,7 +77,8 @@ const normalizeTime = (time: string): string => {
    if (!timeRegex.test(time)) {
       throw new Error('Invalid time format. Please use HH:mm format (e.g., 09:00).');
    }
-   return time;
+   const [hours, minutes] = time.split(':');
+   return `${hours.padStart(2, '0')}:${minutes}`;
 };
 
 const eventSchema = new Schema<EventDocument>(
@@ -171,9 +195,157 @@ eventSchema.pre('save', function (next) {
    next();
 });
 
+// Pre-findOneAndUpdate hook to normalize date/time, generate slug, and validate required fields
+eventSchema.pre('findOneAndUpdate', function (next) {
+   const update = this.getUpdate();
+
+   if (!update || typeof update !== 'object') {
+      return next();
+   }
+
+   // Handle both direct field updates and $set operator updates
+   const updatePayload = (update as MongooseUpdatePayload).$set || update;
+
+   try {
+      // Normalize date if present in update
+      if (updatePayload.date) {
+         updatePayload.date = normalizeDate(updatePayload.date as string);
+      }
+
+      // Normalize time if present in update
+      if (updatePayload.time) {
+         updatePayload.time = normalizeTime(updatePayload.time as string);
+      }
+
+      // Generate slug if title is present in update
+      if (updatePayload.title) {
+         updatePayload.slug = generateSlug(updatePayload.title as string);
+      }
+
+      // Validate required fields in update
+      const requiredFields: (keyof EventDocument)[] = ['title', 'description', 'overview', 'image', 'venue', 'location', 'organizer'];
+      for (const field of requiredFields) {
+         if (field in updatePayload) {
+            const value = updatePayload[field];
+            if (!value || (typeof value === 'string' && (value as string).trim() === '')) {
+               return next(new Error(`${field} cannot be empty`));
+            }
+         }
+      }
+
+      // Apply changes back to the update object
+      if ((update as MongooseUpdatePayload).$set) {
+         (update as MongooseUpdatePayload).$set = updatePayload as Record<string, unknown>;
+      }
+   } catch (error) {
+      return next(error as Error);
+   }
+
+   next();
+});
+
+// Pre-updateOne hook for direct updateOne operations
+eventSchema.pre('updateOne', function (next) {
+   const update = this.getUpdate();
+
+   if (!update || typeof update !== 'object') {
+      return next();
+   }
+
+   // Handle both direct field updates and $set operator updates
+   const updatePayload = (update as MongooseUpdatePayload).$set || update;
+
+   try {
+      // Normalize date if present in update
+      if (updatePayload.date) {
+         updatePayload.date = normalizeDate(updatePayload.date as string);
+      }
+
+      // Normalize time if present in update
+      if (updatePayload.time) {
+         updatePayload.time = normalizeTime(updatePayload.time as string);
+      }
+
+      // Generate slug if title is present in update
+      if (updatePayload.title) {
+         updatePayload.slug = generateSlug(updatePayload.title as string);
+      }
+
+      // Validate required fields in update
+      const requiredFields: (keyof EventDocument)[] = ['title', 'description', 'overview', 'image', 'venue', 'location', 'organizer'];
+      for (const field of requiredFields) {
+         if (field in updatePayload) {
+            const value = updatePayload[field];
+            if (!value || (typeof value === 'string' && (value as string).trim() === '')) {
+               return next(new Error(`${field} cannot be empty`));
+            }
+         }
+      }
+
+      // Apply changes back to the update object
+      if ((update as MongooseUpdatePayload).$set) {
+         (update as MongooseUpdatePayload).$set = updatePayload as Record<string, unknown>;
+      }
+   } catch (error) {
+      return next(error as Error);
+   }
+
+   next();
+});
+
+// Pre-findByIdAndUpdate hook for findByIdAndUpdate operations
+eventSchema.pre('findByOneAndUpdate', function (next) {
+   const update = this.getUpdate();
+
+   if (!update || typeof update !== 'object') {
+      return next();
+   }
+
+   // Handle both direct field updates and $set operator updates
+   const updatePayload = (update as MongooseUpdatePayload).$set || update;
+
+   try {
+      // Normalize date if present in update
+      if (updatePayload.date) {
+         updatePayload.date = normalizeDate(updatePayload.date as string);
+      }
+
+      // Normalize time if present in update
+      if (updatePayload.time) {
+         updatePayload.time = normalizeTime(updatePayload.time as string);
+      }
+
+      // Generate slug if title is present in update
+      if (updatePayload.title) {
+         updatePayload.slug = generateSlug(updatePayload.title as string);
+      }
+
+      // Validate required fields in update
+      const requiredFields: (keyof EventDocument)[] = ['title', 'description', 'overview', 'image', 'venue', 'location', 'organizer'];
+      for (const field of requiredFields) {
+         if (field in updatePayload) {
+            const value = updatePayload[field];
+            if (!value || (typeof value === 'string' && (value as string).trim() === '')) {
+               return next(new Error(`${field} cannot be empty`));
+            }
+         }
+      }
+
+      // Apply changes back to the update object
+      if ((update as MongooseUpdatePayload).$set) {
+         (update as MongooseUpdatePayload).$set = updatePayload as Record<string, unknown>;
+      }
+   } catch (error) {
+      return next(error as Error);
+   }
+
+   next();
+});
+
 /**
  * Event Model - represents a developer event/conference/meetup
+ * Reuse existing model during Next.js hot-reload to avoid OverwriteModelError
  */
-const Event: Model<EventDocument> = model<EventDocument>('Event', eventSchema);
+const Event: Model<EventDocument> = (models.Event as Model<EventDocument>) || model<EventDocument>('Event', eventSchema);
 
 export default Event;
