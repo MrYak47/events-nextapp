@@ -27,12 +27,17 @@ import { Schema, model, Document, Model } from 'mongoose';
  * Converts to lowercase, removes special chars, replaces spaces with hyphens
  */
 const generateSlug = (title: string): string => {
-   return title
+   const slug = title
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') // Remove special characters
       .replace(/\s+/g, '-') // Replace spaces with hyphens
       .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+   
+   if (!slug) {
+      throw new Error('Title must contain at least one alphanumeric character for slug generation');
+   }
+   return slug;
 };
 
 /**
