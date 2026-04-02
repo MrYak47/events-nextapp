@@ -1,6 +1,10 @@
 import mongoose, { Connection } from 'mongoose';
+import dns from 'dns';
 
 // Type definition for the global cache to store the mongoose connection
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 interface MongooseCache {
    conn: Connection | null;
    promise: Promise<Connection> | null;
@@ -76,18 +80,18 @@ export async function connectDB(): Promise<Connection> {
  * @returns Promise<void>
  */
 export async function disconnectDB(): Promise<void> {
-         try {
-            await cached.promise;
-         } catch {
-            // ignore: connection attempt already failed
-         }
-      
-         if (mongoose.connection.readyState !== 0) {
-            await mongoose.disconnect();
-         }
-      
-         cached.conn = null;
-         cached.promise = null;
+   try {
+      await cached.promise;
+   } catch {
+      // ignore: connection attempt already failed
+   }
+
+   if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+   }
+
+   cached.conn = null;
+   cached.promise = null;
 }
 
 /**

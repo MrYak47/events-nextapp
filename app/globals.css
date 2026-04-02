@@ -184,7 +184,7 @@
       }
 
       .details {
-         @apply flex w-full flex-col lg:flex-row gap-12 items-start mt-12 max-lg:items-center;
+         @apply flex w-full flex-col lg:flex-row gap-12 items-start mt-12 ;
 
          .content {
          @apply flex flex-[2] flex-col gap-8 max-lg:w-full;
@@ -193,15 +193,7 @@
                @apply max-h-[457px] w-full rounded-lg object-cover;
             }
 
-            .agenda {
-               @apply flex flex-col gap-2;
-
-               ul {
-                  li {
-                  @apply text-light-100 text-lg max-sm:text-sm;
-                  }
-               }
-            }
+            
          }
 
          .booking {
