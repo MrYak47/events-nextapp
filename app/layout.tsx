@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
-import { Schibsted_Grotesk, Martian_Mono, Geist } from "next/font/google";
+import { Schibsted_Grotesk, Martian_Mono} from "next/font/google";
 import "./globals.css";
 import "./(root)/root.css"
-import { cn } from "@/lib/utils";
 import LightRays from '../components/LightRays'
 import Navbar from '../components/Navbar'
-import { PostHogProvider } from '../components/PostHogProvider'
 import { PostHogPageView } from '../components/PostHogPageView'
+import { PostHogProviderWrapper } from '../components/PostHogProviderWrapper'
 import { Suspense } from 'react'
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const schibstedG = Schibsted_Grotesk({
-   variable: "--font-schibsted_grotesk",
+// Google font configs
+const schibstedGrotesk = Schibsted_Grotesk({
    subsets: ["latin"],
+   weight: ["400", "500", "700"], // adjust as needed
+   variable: "--font-schibsted-grotesk",
+   display: "swap",
 });
 
-
-const matianM = Martian_Mono({
-   variable: "--font-martian-mono",
+const martianMono = Martian_Mono({
    subsets: ["latin"],
+   weight: ["400", "500", "700"], // adjust as needed
+   variable: "--font-martian-mono",
+   display: "swap",
 });
 
 
@@ -36,9 +37,10 @@ export default function RootLayout({children,}:
       
    return (
       <html lang="en" >
-         <body className={`${schibstedG.variable} ${matianM.variable} min-h-screen antialiased`}>
-         <PostHogProvider>
-         <Suspense fallback={null}><PostHogPageView /></Suspense>
+         <body className={`${schibstedGrotesk.variable} ${martianMono.variable}`}>
+            <PostHogProviderWrapper>
+               
+            <Suspense fallback={null}><PostHogPageView /></Suspense>
 
             <Navbar />
             
@@ -63,8 +65,8 @@ export default function RootLayout({children,}:
                {children}
             </main>
          
+            </PostHogProviderWrapper>
          
-         </PostHogProvider>
          </body>
 
 

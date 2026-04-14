@@ -1,8 +1,9 @@
-import React from 'react';
+
 import { notFound } from "next/navigation";
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { getSimilarEventsBySlug } from '@/lib/actions/event.actions';
+import { cacheLife } from 'next/cache';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 import '../event.css';
@@ -44,19 +45,23 @@ const EventTags = ({ tags }: { tags: string[] }) => (
 
 
 async function Event({params}: { params: Promise<{ slug: string }>}) {
+
+   'use cache';
+
+   cacheLife('minutes');
+   
    const { slug } = await params;
    const bookings = 10;
 
    
    try {
 
-
-      const request = await fetch(`${BASE_URL}/api/events/${encodeURIComponent(slug)}`);
+      const request = await fetch(`${BASE_URL}/api/events/${slug}`);
       if (!request.ok) {
          throw new Error(`Failed to fetch event: ${request.status}`);
       }
       const response = await request.json();
-      const { description, image, overview, date, time, location, mode, agenda, audience, organizer, tags } = response.data;
+      const { _id, description, image, overview, date, time, location, mode, agenda, audience, organizer, tags } = response.data;
       if (!description) return notFound();
 
       const simEvents: IEvent[] = await getSimilarEventsBySlug(slug);
@@ -71,7 +76,7 @@ async function Event({params}: { params: Promise<{ slug: string }>}) {
             <div className='details'>
                {/* Left Column - Event Content */}
                <div className="content">
-                  <Image src={image} alt={slug} width={800} height={800} className="banner" />
+                  <Image src={image} alt={slug} width={800} height={800} loading="eager" className="banner" />
                
                   <section className="overview">
                      <h2>Overview</h2>
@@ -106,7 +111,8 @@ async function Event({params}: { params: Promise<{ slug: string }>}) {
                      <h2> Book Your Spot Now! </h2>
                      {bookings > 0 ? ( <p>Join {bookings} others who have already booked thier spot!</p>
                         ): (<p>Be the first to book your spot!</p>)}
-                     <BookEvent />
+
+                     <BookEvent eventId={_id} slug={slug} />
                   </div>
                </aside>
             </div>
