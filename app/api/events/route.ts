@@ -73,7 +73,10 @@ export async function GET() {
    try{
       await connectDB();
 
-      const events = await Event.find().sort({ createdAt: -1});
+      const events = await Event.find()
+         .select('title image slug location date time category')
+         .sort({ createdAt: -1})
+         .lean();
 
       return NextResponse.json({message: 'Events fetched successfully', events}, {status: 200});
    } catch (e) {

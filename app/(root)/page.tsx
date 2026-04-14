@@ -12,7 +12,7 @@ async function EventsList() {
    'use cache';
 
    try {
-      cacheLife('hours', 1);
+      cacheLife('hours');
       const response = await fetch(`${BASE_URL}/api/events`);
       if (!response.ok) {
          throw new Error(`Failed to fetch events: ${response.status}`);
