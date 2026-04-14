@@ -4,23 +4,22 @@ import ExploreBtn from '@/components/ExploreBtn'
 import EventCard from '@/components/EventCard'
 import { IEvent } from '@/database/event.model'
 import { cacheLife } from 'next/cache';
-import { events } from '@/lib/constants'
 
 
-// const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function EventsList() {
    'use cache';
 
-   // try {
+   try {
       cacheLife('hours');
 
 
-      // const response = await fetch(`${BASE_URL}/api/events`);
-      // if (!response.ok) {
-      //    throw new Error(`Failed to fetch events: ${response.status}`);
-      // }
-      // const { events } = await response.json();
+      const response = await fetch(`${BASE_URL}/api/events`);
+      if (!response.ok) {
+         throw new Error(`Failed to fetch events: ${response.status}`);
+      }
+      const { events } = await response.json();
 
       return (
          <ul className='events'>
@@ -31,14 +30,14 @@ async function EventsList() {
             ))}
          </ul>
       );
-   // } catch (error) {
-   //    console.error('Error loading events:', error);
-   //    return (
-   //       <ul className='events'>
-   //          <li>Failed to load events. Please try again later.</li>
-   //       </ul>
-   //    );
-   // }
+   } catch (error) {
+      console.error('Error loading events:', error);
+      return (
+         <ul className='events'>
+            <li>Failed to load events. Please try again later.</li>
+         </ul>
+      );
+   }
 }
 
 
