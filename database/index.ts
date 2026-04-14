@@ -4,4 +4,4 @@
  */
 
 export { default as Event, type EventDocument } from './event.model';
-export { default as Booking, type BookingDocument } from './booking.model';
+export { Booking, type IBooking as BookingDocument } from './booking.model';

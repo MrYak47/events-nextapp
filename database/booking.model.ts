@@ -1,15 +1,17 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import Event from './event.model';
 
 /**
  * BookingDocument represents a MongoDB document for a Booking
  */
-export interface BookingDocument extends Document {
+export interface IBooking extends Document {
    eventId: Types.ObjectId;
+   slug: string;
    email: string;
+   name: string;
    createdAt: Date;
    updatedAt: Date;
 }
+
 
 /**
  * Validate email format
@@ -19,13 +21,19 @@ const isValidEmail = (email: string): boolean => {
    return emailRegex.test(email);
 };
 
-const bookingSchema = new Schema<BookingDocument>(
+const bookingSchema = new Schema<IBooking>(
    {
       eventId: {
          type: Schema.Types.ObjectId,
          ref: 'Event',
          required: [true, 'Event ID is required'],
          index: true, // Create index for faster queries
+      },
+      slug: {
+         type: String,
+         required: [true, 'Slug is required'],
+         trim: true,
+         lowercase: true,
       },
       email: {
          type: String,
@@ -37,35 +45,29 @@ const bookingSchema = new Schema<BookingDocument>(
          message: 'Please provide a valid email address',
          },
       },
+      name: {
+         type: String,
+         required: [true, 'Name is required'],
+         trim: true,
+         minlength: [2, 'Name must be at least 2 characters long'],
+         maxlength: [100, 'Name cannot exceed 100 characters'],
+      },
    },
    {
       timestamps: true,
    }
 );
 
-// Pre-save hook to verify that the referenced event exists
-bookingSchema.pre('save', async function (next) {
-   try {
-      // Validate email format
-      if (!isValidEmail(this.email)) {
-         return next(new Error('Invalid email format'));
-      }
-
-      // Verify that the referenced event exists
-      const eventExists = await Event.findById(this.eventId);
-      if (!eventExists) {
-         return next(new Error(`Event with ID ${this.eventId} does not exist`));
-      }
-
-      next();
-   } catch (error) {
-      next(error as Error);
-   }
-});
-
 /**
  * Booking Model - represents a user booking/registration for an event
  */
-const Booking: Model<BookingDocument> = model<BookingDocument>('Booking', bookingSchema);
+const Booking = (() => {
+   try {
+      return model<IBooking>('Booking');
+   } catch (err) {
+      return model<IBooking>('Booking', bookingSchema);
+   }
+})();
 
-export default Booking;
+export { Booking };
+

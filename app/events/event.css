@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer components {
+   #event {
+
+
+      h1{
+         @apply capitalize text-4xl font-bold mb-4;
+      }
+
+
+      .details {
+
+         .content {
+            @apply w-[80%] ;
+
+            h2 {
+               @apply  mb-4 text-2xl font-bold;
+            }
+
+            .banner {
+               @apply h-80;
+            }
+
+            .overview {
+               @apply flex flex-col gap-2;
+            }
+
+            .icon {
+               @apply flex flex-row gap-2 items-center mb-2;
+            }
+
+            .agenda {
+               @apply flex flex-col gap-2;
+
+               ul {
+                  li {
+                  @apply text-lg max-sm:text-sm;
+                  }
+               }
+            }
+
+            .organ {
+               @apply flex flex-col gap-2;
+
+            }
+
+         }
+
+         .booking {
+
+            .button-submit {
+               @apply bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors duration-300 ;
+            }
+         }
+      }
+
+      .simevents {
+         @apply mt-12;
+
+         h2 {
+            @apply text-3xl font-bold mb-6;
+         }
+      }
+
+   }
+}
