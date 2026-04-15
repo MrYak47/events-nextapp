@@ -11,33 +11,25 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 async function EventsList() {
    'use cache';
 
-   try {
-      cacheLife('hours');
+   cacheLife('hours');
 
-      const events = await getAllEvents();
-      // const response = await fetch(`${BASE_URL}/api/events`);
-      // if (!response.ok) {
-      //    throw new Error(`Failed to fetch events: ${response.status}`);
-      // }
-      // const { events } = await response.json();
+   const events = await getAllEvents();
+   // const response = await fetch(`${BASE_URL}/api/events`);
+   // if (!response.ok) {
+   //    throw new Error(`Failed to fetch events: ${response.status}`);
+   // }
+   // const { events } = await response.json();
 
-      return (
-         <ul className='events'>
-            {events && events.length > 0 && events.map((event: IEvent) => (
-               <li key={event._id as unknown as string}>
-                  <EventCard {...event} />
-               </li>
-            ))}
-         </ul>
-      );
-   } catch (error) {
-      console.error('Error loading events:', error);
-      return (
-         <ul className='events'>
-            <li>Failed to load events. Please try again later.</li>
-         </ul>
-      );
-   }
+   return (
+      <ul className='events'>
+         {events && events.length > 0 && events.map((event: IEvent) => (
+            <li key={event._id as unknown as string}>
+               <EventCard {...event} />
+            </li>
+         ))}
+      </ul>
+   );
+
 }
 
 
